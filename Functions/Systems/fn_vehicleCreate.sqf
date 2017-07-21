@@ -25,6 +25,7 @@ _side = switch (_side) do {
     case west:{"cop"};
     case civilian: {"civ"};
     case independent: {"med"};
+    case east: {"rebel"};
     default {"Error"};
 };
 

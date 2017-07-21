@@ -26,6 +26,8 @@ _query = switch (_side) do {
     case civilian: {format ["SELECT pid, name, cash, bankacc, adminlevel, donorlevel, civ_licenses, arrested, civ_gear, civ_stats, civ_alive, civ_position, playtime FROM players WHERE pid='%1'",_uid];};
     // Independent - 10 entries returned
     case independent: {format ["SELECT pid, name, cash, bankacc, adminlevel, donorlevel, med_licenses, mediclevel, med_gear, med_stats, playtime FROM players WHERE pid='%1'",_uid];};
+    // rebel - 10 entries returned
+    case east: {format ["SELECT pid, name, cash, bankacc, adminlevel, donorlevel, rebel_licenses, rebellevel, rebel_gear, rebel_stats, playtime FROM players WHERE pid='%1'",_uid];};
 };
 
 _tickTime = diag_tickTime;
@@ -132,6 +134,26 @@ switch (_side) do {
     };
 
     case independent: {
+        //Parse Stats
+        _new = [(_queryResult select 9)] call DB_fnc_mresToArray;
+        if (_new isEqualType "") then {_new = call compile format ["%1", _new];};
+        _queryResult set[9,_new];
+
+        //Playtime
+        _new = [(_queryResult select 10)] call DB_fnc_mresToArray;
+        if (_new isEqualType "") then {_new = call compile format ["%1", _new];};
+        _index = TON_fnc_playtime_values_request find [_uid, _new];
+        if !(_index isEqualTo -1) then {
+            TON_fnc_playtime_values_request set[_index,-1];
+            TON_fnc_playtime_values_request = TON_fnc_playtime_values_request - [-1];
+            TON_fnc_playtime_values_request pushBack [_uid, _new];
+        } else {
+            TON_fnc_playtime_values_request pushBack [_uid, _new];
+        };
+        [_uid,_new select 1] call TON_fnc_setPlayTime;
+    };
+
+    case east: {
         //Parse Stats
         _new = [(_queryResult select 9)] call DB_fnc_mresToArray;
         if (_new isEqualType "") then {_new = call compile format ["%1", _new];};
