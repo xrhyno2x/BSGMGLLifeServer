@@ -171,6 +171,14 @@ switch (_side) do {
             TON_fnc_playtime_values_request pushBack [_uid, _new];
         };
         [_uid,_new select 1] call TON_fnc_setPlayTime;
+
+        /* Make sure nothing else is added under here */
+        _houseData = _uid spawn TON_fnc_fetchPlayerHouses;
+        waitUntil {scriptDone _houseData};
+        _queryResult pushBack (missionNamespace getVariable [format ["houses_%1",_uid],[]]);
+        _gangData = _uid spawn TON_fnc_queryPlayerGang;
+        waitUntil{scriptDone _gangData};
+        _queryResult pushBack (missionNamespace getVariable [format ["gang_%1",_uid],[]]);
     };
 };
 
